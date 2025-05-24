@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/assembler.iml" filepath="$PROJECT_DIR$/assembler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/vm_translator.iml" filepath="$PROJECT_DIR$/.idea/vm_translator.iml" />
     </modules>
   </component>
 </project>

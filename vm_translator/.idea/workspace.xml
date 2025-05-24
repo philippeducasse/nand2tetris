@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="412856f5-906c-4e16-abe7-0df73f3823e0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../06/Add.asm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../06/Max.asm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../06/MaxL.asm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../06/Pong.asm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../06/PongL.asm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../06/Rect.asm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../06/RectL.asm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/Add.hack" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/Max.hack" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/Pong.hack" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/Rect.hack" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/prog.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/project6.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../nand2tetris.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../out/production/nand2tetris/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/Asm.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/Asm.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/Parser.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/Parser.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/Translator.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/Translator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/constants/InstructionMaps.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/constants/InstructionMaps.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/constants/SymbolTable.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/constants/SymbolTable.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
+  <component name="ProjectId" id="2xSgkkOQG6qM8YJobRRXMoqcuOu" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/Users/philippeducasse/Desktop/code/nand2tetris/vm_translator"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="412856f5-906c-4e16-abe7-0df73f3823e0" name="Changes" comment="" />
+      <created>1747937033964</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1747937033964</updated>
+    </task>
+    <servers />
+  </component>
+</project>
