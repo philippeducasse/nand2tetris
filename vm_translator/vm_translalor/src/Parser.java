@@ -1,37 +1,63 @@
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
 
 public class Parser {
-    String fileName;
     ArrayList<String> instructions;
-    int lineCount = 0;
+    int lineCount = 1;
 
-    public Parser(String[] fileName){
-        this.fileName = fileName[0];
+    public Parser() {
         instructions = new ArrayList<>();
     }
 
-     public void readFile() throws IOException {
-        List<String> lines = Files.readAllLines(Paths.get(fileName));
+    public void processInput(String[] args) throws IOException {
+        File input = new File(args[0]);
 
-        for (String line : lines){
-            if (hasMoreCommands()){
+        if (!input.exists()) {
+            System.out.println("Input does not exist.");
+            return;
+        }
+
+        if (input.isDirectory()) {
+            File[] files = input.listFiles();
+            if (files == null || files.length == 0) {
+                System.out.println("Directory is empty.");
+                return;
+            }
+            for (File file : files) {
+                if (file.isFile()) {
+                    this.read(file);
+                }
+            }
+        } else if (input.isFile()) {
+            this.read(input);
+        } else {
+            System.out.println("Input is neither a file nor a directory.");
+        }
+    }
+
+    public void read(File fileName) throws IOException {
+        instructions.add("File: " + fileName.getName());
+
+        List<String> lines = Files.readAllLines(fileName.toPath());
+        for (String line : lines) {
+            if (hasMoreCommands()) {
                 advance(line);
             }
         }
     }
 
-    public void advance(String line){
-        if(!line.startsWith("//") && !line.isEmpty()){
-            instructions.add(line.strip());
+    public void advance(String line) {
+        if (!line.startsWith("//") && !line.isEmpty()) {
+            String parsedLine= line.split("//")[0].strip();
+            instructions.add(parsedLine);
         }
         this.lineCount++;
     }
 
-    public Boolean hasMoreCommands(){
+    public Boolean hasMoreCommands() {
         return lineCount >= instructions.size();
     }
 }
