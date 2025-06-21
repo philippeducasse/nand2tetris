@@ -27,7 +27,7 @@ public class Parser {
                 return;
             }
             for (File file : files) {
-                if (file.isFile()) {
+                if (file.isFile() && file.getName().endsWith(".vm")) {
                     this.read(file);
                 }
             }

@@ -5,17 +5,19 @@ public class CodeWriter {
     ArrayList<String> asmInstructions;
     String[] fileNames;
     String currentFileName;
-    int counter = 0;
+    int labelCounter = 0;
+    int programCounter;
+    int returnCounter = 0;
 
     public CodeWriter(ArrayList<String> vmInstructions, String[] fileNames) {
         this.vmInstructions = vmInstructions;
         this.asmInstructions = new ArrayList<>();
         this.fileNames = fileNames;
         this.currentFileName = "";
+        this.programCounter = 0;
+
 
         System.out.println("VM INSTRUCTIONS:" + this.vmInstructions);
-        System.out.println("ASM INSTRUCTIONS:" + this.asmInstructions);
-
 
         // Sets SP to 256 and calls sys.init;
         this.writeInit();
@@ -49,6 +51,7 @@ public class CodeWriter {
                     writeArithmetic(instruction);
                     break;
             }
+            this.programCounter++;
         }
     }
 
@@ -70,7 +73,6 @@ public class CodeWriter {
     }
 
     public void writeGoTo(String label) {
-        System.out.println("WRITING GOTO");
         String labelName = label.split(" ")[1];
         String asmLabel = "@" + labelName;
 
@@ -79,7 +81,6 @@ public class CodeWriter {
     }
 
     public void writeIf(String label) {
-        System.out.println("WRITE IF: " + label);
         String labelName = label.split(" ")[1];
         String asmLabel = "@" + labelName;
         ArrayList<String> ifCmd = new ArrayList<>(Arrays.asList(
@@ -104,49 +105,92 @@ public class CodeWriter {
         asmFunctionInstruction.add(asmFunctionLabel);
         // assign LCL to current SP
         asmFunctionInstruction.addAll(Arrays.asList(
-                 "@SP", "D=M", "@LCL", "M=D"
+                "@SP", "D=M", "@LCL", "M=D"
         ));
 
         // initiate n LCL registers to 0
         for (int i = 0; i < n; i++) {
             asmFunctionInstruction.addAll(Arrays.asList(
-                    "@0" , "D=A", "@SP", "AM=M+1", "A=A-1", "M=D"
+                    "@0", "D=A", "@SP", "AM=M+1", "A=A-1", "M=D"
             ));
         }
         this.asmInstructions.addAll(asmFunctionInstruction);
     }
 
     public void writeCall(String label) {
-        // CALLER
+        String[] labels = label.split(" ");
+        String n = labels[2];
         // call foo n
-            // 1. set ARG to base address of n
-            // 2. save the callers frame:
-                    // return address
-                        // (Foo$ret.1)
-                    // saved LCL
-                        // push LCL
-                    // push ARG
-                    // push THIS
-                    // push THAT
-            // ARG = SP - 5 - n -> repositions the the ARG pointer
-            // LCL = SP -> reposition LCL
+        String comment = "// " + label;
+        ArrayList<String> asmCallInstruction = new ArrayList<>(Arrays.asList(
+                comment
+        ));
+
+        // 1. set ARG to base address of n
+        String baseAddressOfN = "@" + n;
+
+        asmCallInstruction.addAll(Arrays.asList(
+                baseAddressOfN, "D=A", "@SP", "A=M", "D=M-D", "@ARG", "M=D"
+        ));
+
+        // 2. save the callers frame:
+        // return address
+        // (Foo$ret.1)
+        String returnLabel = "(" + labels[1] + "$ret." + returnCounter + ")";
+        String pc = "@" + this.programCounter;
+
+        asmCallInstruction.addAll(Arrays.asList(
+                pc, "D=A", "@SP", "AM=M+1", "A=A-1", "M=D"
+        ));
+
+        // push LCL
+        asmCallInstruction.addAll(Arrays.asList(
+                "@LCL", "D=M", "@SP", "AM=M+1", "A=A-1", "M=D"
+        ));
+        // push ARG
+        asmCallInstruction.addAll(Arrays.asList(
+                "@ARG", "D=M", "@SP", "AM=M+1", "A=A-1", "M=D"
+        ));
+        // push THIS
+        asmCallInstruction.addAll(Arrays.asList(
+                "@THIS", "D=M", "@SP", "AM=M+1", "A=A-1", "M=D"
+        ));
+        // push THAT
+        asmCallInstruction.addAll(Arrays.asList(
+                "@THAT", "D=M", "@SP", "AM=M+1", "A=A-1", "M=D"
+        ));
+        // ARG = SP - 5 - n -> repositions the the ARG pointer
+        asmCallInstruction.addAll(Arrays.asList(
+                "@5", "D=A", "@" + n, "D=D+A", "@SP", "D=M-D", "@ARG", "M=D"
+        ));
+        // LCL = SP -> reposition LCL
+        asmCallInstruction.addAll(Arrays.asList(
+                "@SP", "D=M", "@LCL", "M=D"
+        ));
+
         // JUMP to the called function
+        asmCallInstruction.addAll(Arrays.asList(
+                "@" + labels[1], "0;JMP"
+        ));
+
         // insert (Foo$ret.1) return label
-        System.out.println("WRITE CALL: " + label);
+        asmCallInstruction.add(returnLabel);
+        this.asmInstructions.addAll(asmCallInstruction);
+        returnCounter++;
     }
 
     public void writeReturn() {
-        String comment = "// return" ;
+        String comment = "// return";
 
         // endFrame = LCL -> endFrame is a temp variable and refers to everything that should be deleted after return
         ArrayList<String> asmReturnInstruction = new ArrayList<>(Arrays.asList(
-               comment, "@LCL", "D=M", "@R13" , "M=D"
+                comment, "@LCL", "D=M", "@R13", "M=D"
         ));
 
         // push last value of the SP of the callee and overwrite the arg[0] on the stack
         asmReturnInstruction.addAll(Arrays.asList(
                 // *ARG = pop()
-                "@SP", "AM=M-1", "D=M", "@ARG", "A=M","M=D",
+                "@SP", "AM=M-1", "D=M", "@ARG", "A=M", "M=D",
                 // SP = ARG +1
                 "@ARG", "D=M+1", "@SP", "M=D"
         ));
@@ -156,11 +200,11 @@ public class CodeWriter {
                 // THAt = *(endFrame -1)
                 "@R13", "A=M-1", "D=M", "@THAT", "M=D",
                 // THIS = *(endFrame -2)
-                "@2", "D=A","@R13", "A=M-D", "D=M", "@THIS", "M=D",
+                "@2", "D=A", "@R13", "A=M-D", "D=M", "@THIS", "M=D",
                 // ARG = *(endFrame -3)
-                "@3", "D=A","@R13", "A=M-D", "D=M", "@ARG", "M=D",
+                "@3", "D=A", "@R13", "A=M-D", "D=M", "@ARG", "M=D",
                 // LCL = *(endFrame -4)
-                "@4", "D=A","@R13", "A=M-D", "D=M", "@LCL", "M=D"
+                "@4", "D=A", "@R13", "A=M-D", "D=M", "@LCL", "M=D"
         ));
 
         // get return address
@@ -188,36 +232,36 @@ public class CodeWriter {
             case "eq":
                 ArrayList<String> eq = new ArrayList<>(
                         Arrays.asList("@SP", "AM=M-1", "D=M", "A=A-1", "D=M-D",  // x-y
-                                "@SET_TRUE_" + counter, "D;JEQ",   // if value is 0, set to true (-1)
-                                "@SP", "A=M-1", "M=0", "@END_" + counter, "0;JMP", // if not, sent to 0 (false)
-                                "(SET_TRUE_" + counter + ")", "@SP", "A=M-1", "M=-1", "@END_" + counter, "0;JMP",
-                                "(END_" + counter + ")"
+                                "@SET_TRUE_" + labelCounter, "D;JEQ",   // if value is 0, set to true (-1)
+                                "@SP", "A=M-1", "M=0", "@END_" + labelCounter, "0;JMP", // if not, sent to 0 (false)
+                                "(SET_TRUE_" + labelCounter + ")", "@SP", "A=M-1", "M=-1", "@END_" + labelCounter, "0;JMP",
+                                "(END_" + labelCounter + ")"
                         ));
-                counter++;
+                labelCounter++;
                 this.asmInstructions.addAll(eq);
                 break;
 
             case "lt":
                 ArrayList<String> lt = new ArrayList<>(
                         Arrays.asList("@SP", "AM=M-1", "D=M", "A=A-1", "D=M-D",
-                                "@SET_TRUE_" + counter, "D;JLT",
-                                "@SP", "A=M-1", "M=0", "@END_" + counter, "0;JMP",
-                                "(SET_TRUE_" + counter + ")", "@SP", "A=M-1", "M=-1", "@END_" + counter, "0;JMP",
-                                "(END_" + counter + ")"
+                                "@SET_TRUE_" + labelCounter, "D;JLT",
+                                "@SP", "A=M-1", "M=0", "@END_" + labelCounter, "0;JMP",
+                                "(SET_TRUE_" + labelCounter + ")", "@SP", "A=M-1", "M=-1", "@END_" + labelCounter, "0;JMP",
+                                "(END_" + labelCounter + ")"
                         ));
-                counter++;
+                labelCounter++;
                 this.asmInstructions.addAll(lt);
                 break;
 
             case "gt":
                 ArrayList<String> gt = new ArrayList<>(
                         Arrays.asList("@SP", "AM=M-1", "D=M", "A=A-1", "D=M-D",
-                                "@SET_TRUE_" + counter, "D;JGT",
-                                "@SP", "A=M-1", "M=0", "@END_" + counter, "0;JMP",
-                                "(SET_TRUE_" + counter + ")", "@SP", "A=M-1", "M=-1", "@END_" + counter, "0;JMP",
-                                "(END_" + counter + ")"
+                                "@SET_TRUE_" + labelCounter, "D;JGT",
+                                "@SP", "A=M-1", "M=0", "@END_" + labelCounter, "0;JMP",
+                                "(SET_TRUE_" + labelCounter + ")", "@SP", "A=M-1", "M=-1", "@END_" + labelCounter, "0;JMP",
+                                "(END_" + labelCounter + ")"
                         ));
-                counter++;
+                labelCounter++;
                 this.asmInstructions.addAll(gt);
                 break;
 
